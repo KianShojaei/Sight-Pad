@@ -32,7 +32,7 @@ This project allows users to control mouse movements, perform clicks, right-clic
 ## Features
 - **Mouse Control**: Move the mouse with your right hand's index finger.
 - **Left/Right Click Detection**: Perform left or right-clicks using specific hand gestures.
-- **Double Click**: Detect double-clicks using left hand's index finger positions.
+- **Double Click**: Detect double-clicks using left hand's index finger.
 - **Scroll Control**: Scroll up or down using pinching gestures.
 - **Zoom Control**: Zoom in or out by bringing both hands together and changing their distance.
 
