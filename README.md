@@ -1,192 +1,261 @@
 # Sight-Pad
-𝑹𝒆𝒗𝒐𝒍𝒖𝒕𝒊𝒐𝒏𝒊𝒛𝒆 𝒚𝒐𝒖𝒓 𝒅𝒆𝒗𝒊𝒄𝒆 𝒄𝒐𝒏𝒕𝒓𝒐𝒍 𝒘𝒊𝒕𝒉 𝒊𝒏𝒕𝒖𝒊𝒕𝒊𝒗𝒆 𝒉𝒂𝒏𝒅 𝒈𝒆𝒔𝒕𝒖𝒓𝒆𝒔 – 𝒏𝒐 𝒕𝒐𝒖𝒄𝒉𝒑𝒂𝒅 𝒏𝒆𝒆𝒅𝒆𝒅!
 
+**Sight-Pad** is a webcam-based hand-gesture interaction system designed to control common desktop pointing, clicking, scrolling, and zooming actions without relying on a physical touchpad.
 
+The project uses **MediaPipe** for real-time hand landmark tracking and **PyAutoGUI** for computer interaction. Its gesture logic is implemented through geometric relationships between tracked hand landmarks, combined with timing, thresholds, cooldowns, and interaction states.
 
-
+> **Project scope:** The original implementation source code is intentionally **not included in this public repository**. This repository presents the project's concept, technical architecture, interaction design, demonstrated capabilities, and engineering considerations without publishing the original implementation.
 
 ---
 
-# Hand Gesture Control for Mouse and Zoom
+## Overview
 
-This project allows users to control mouse movements, perform clicks, right-clicks, scroll, and zoom operations using hand gestures via a webcam. The implementation is powered by **MediaPipe** for hand tracking and **PyAutoGUI** for system interaction. The program processes hand gestures in real-time to perform corresponding actions such as moving the mouse, clicking, scrolling, and zooming.
+Sight-Pad explores touchless human-computer interaction through hand tracking.
 
-## Table of Contents
+At a high level, the system follows this pipeline:
 
-- [Features](#features)
-- [Requirements](#requirements)
-- [Setup](#setup)
-- [How It Works](#how-it-works)
-  - [Webcam and Screen Setup](#webcam-and-screen-setup)
-  - [Hand Tracking with MediaPipe](#hand-tracking-with-mediapipe)
-  - [Mouse Control](#mouse-control)
-  - [Click and Double-Click Detection](#click-and-double-click-detection)
-  - [Right-Click Detection](#right-click-detection)
-  - [Scrolling and Zooming](#scrolling-and-zooming)
-- [Key Variables](#key-variables)
-- [Limitations](#limitations)
-- [Future Improvements](#future-improvements)
-- [License](#license)
-- [Contributing](#contributing)
+**Webcam Input → Hand Landmark Detection → Geometric Gesture Analysis → Interaction State → Desktop Action**
 
-## Features
-- **Mouse Control**: Move the mouse with your right hand's index finger.
-- **Left/Right Click Detection**: Perform left or right-clicks using specific hand gestures.
-- **Double Click**: Detect double-clicks using left hand's index finger.
-- **Scroll Control**: Scroll up or down using pinching gestures.
-- **Zoom Control**: Zoom in or out by bringing both hands together and changing their distance.
+The original implementation tracks up to two hands and maps selected hand configurations to mouse and zoom operations.
 
-## Requirements
+### Core capabilities
 
-You will need the following libraries installed:
+- Cursor movement
+- Left click
+- Right click
+- Double click
+- Scroll-mode activation
+- Scroll up / down
+- Two-hand zoom control
 
-- OpenCV (`cv2`)
-- MediaPipe
-- PyAutoGUI
-- NumPy
-- Threading (comes with Python)
+---
 
-You can install these dependencies with:
-```bash
-pip install opencv-python mediapipe pyautogui numpy
-```
+## System Architecture
 
-## Setup
+### 1. Webcam Input
 
-1. **Clone the repository** and navigate into the project folder:
-    ```bash
-    git clone https://github.com/KianShojaei/Sight-Pad.git
-    cd hand-gesture-control
-    ```
+The system captures live video from a webcam using OpenCV.
 
-2. **Install the dependencies** as mentioned above.
+The original implementation configures the camera at **640 × 480** resolution and samples frames periodically rather than processing every captured frame.
 
-3. **Run the script**:
-    ```bash
-    python hand_control.py
-    ```
+### 2. Hand Tracking
 
-    The program will activate your webcam and start tracking your hand gestures. Press **`q`** to quit the program.
+**MediaPipe Hands** is used to detect hand landmarks in real time, with support for up to two hands.
 
-## How It Works
+The detected landmarks provide normalized coordinates for the fingers and other hand joints. These coordinates form the basis for the gesture analysis stage.
 
-### Webcam and Screen Setup
+### 3. Geometric Gesture Analysis
 
-The program initializes the webcam and configures it to capture frames in 640x480 resolution for performance efficiency. It also fetches the screen size to map the coordinates of your hand movements to mouse movements.
+Rather than relying on a trained gesture-classification model, the original implementation determines interactions from distances and spatial relationships between selected landmarks.
 
-```python
-cap = cv2.VideoCapture(0)
-cap.set(3, 640)
-cap.set(4, 480)
+Examples include:
 
-screen_width, screen_height = pyautogui.size()
-```
+- Index fingertip ↔ thumb distance
+- Thumb ↔ pinky distance
+- Thumb ↔ middle/ring finger distances
+- Distance between the two index fingertips
+- Relative positions of multiple fingers
 
-### Hand Tracking with MediaPipe
+### 4. Desktop Interaction
 
-**MediaPipe** is used to detect hand landmarks (finger positions). Based on the position of the index and thumb fingers, different actions like mouse movement, clicks, or scroll are triggered.
+Detected interactions are translated into operating-system mouse and keyboard actions through **PyAutoGUI**.
 
-```python
-mp_hands = mp.solutions.hands
-hands = mp_hands.Hands(max_num_hands=2)
-```
+Cursor movement is handled separately from several gesture-triggered actions, and the original implementation uses threaded cursor updates as part of its interaction design.
 
-### Mouse Control
+---
 
-Your right hand controls the mouse pointer. The position of the index finger tip on the right hand is tracked, and the mouse is moved accordingly using **PyAutoGUI**.
+## Gesture-to-Action Mapping
 
-```python
-x = int(index_finger_tip.x * screen_width)
-y = int(index_finger_tip.y * screen_height)
-pyautogui.moveTo(x, y)
-```
+| Interaction | Hand configuration / condition | Result |
+|---|---|---|
+| Cursor movement | Right-hand index fingertip tracking | Move mouse cursor |
+| Left click | Left-hand index-thumb pinch | Left mouse button |
+| Right click | Right-hand thumb-pinky proximity | Right mouse button |
+| Double click | Dedicated left-hand multi-finger configuration | Double click |
+| Scroll mode | Left-hand thumb-middle and thumb-ring proximity | Toggle scrolling |
+| Scroll | Left-hand index-thumb distance while scroll mode is active | Scroll up / down |
+| Start zooming | Both index fingertips brought close together | Enter zoom mode |
+| Stop zooming | Both hands satisfy the zoom-release condition | Exit zoom mode |
+| Zoom | Change in distance between the two index fingertips | Zoom in / out |
 
-### Click and Double-Click Detection
+The exact thresholds and timing rules are implementation-specific and were designed to reduce unintended repeated actions.
 
-- **Left Click**: Detected by pinching the thumb and index finger of your left hand.
-- **Double Click**: Detected when the left-hand fingers are held in a specific position and can only happen once every two seconds to avoid repetitive double-clicks.
+---
 
-```python
-if distance < click_threshold:
-    pyautogui.mouseDown()  # Left-click down
-elif distance > release_threshold:
-    pyautogui.mouseUp()  # Release the click
-```
+## Demonstrated Interactions
 
-### Right-Click Detection
+The repository includes visual demonstrations of the project's interaction vocabulary.
 
-Right-click is detected when your right hand's **thumb** and **pinky** fingers touch.
+### Left Click
 
-```python
-if thumb_pinky_distance < 0.05:
-    pyautogui.rightClick()  # Perform right-click
-```
+![Left Click](Images/left-click.png)
 
-### Scrolling and Zooming
+Demonstrates the left-click interaction.
 
-- **Scrolling**: Activate scroll by pinching together the thumb, middle, and ring fingers of your left hand.
-- **Zooming**: Use both hands to zoom. Bringing both index fingers together activates zoom mode, and changing the distance between your hands zooms in or out.
+### Right Click
 
-```python
-if scrolling_active:
-    pyautogui.scroll(-100)  # Scroll down
-```
+![Right Click](Images/right-click.png)
 
-For zoom:
-```python
-if zoom_delta > 0:
-    pyautogui.hotkey('ctrl', '+')  # Zoom in
-else:
-    pyautogui.hotkey('ctrl', '-')  # Zoom out
-```
+Demonstrates the right-click interaction.
 
-## Key Variables
+### Double Click
 
-- **`frame_skip`**: The program skips frames to speed up processing. Every third frame is processed.
-- **`click_threshold`**: The threshold distance for detecting a click gesture.
-- **`scrolling_active`**: A toggle to enable or disable scrolling functionality.
-- **`zoom_scale_factor`**: Sensitivity of the zoom gesture.
+![Double Click](Images/double-click.png)
+
+Demonstrates the double-click interaction.
+
+### Scroll Mode
+
+![Scroll Mode](Images/scroll-mode.png)
+
+Demonstrates activation of the scrolling interaction mode.
+
+### Scroll Up
+
+![Scroll Up](Images/scroll-up.png)
+
+Demonstrates the scroll-up interaction.
+
+### Scroll Down
+
+![Scroll Down](Images/scroll-down.png)
+
+Demonstrates the scroll-down interaction.
+
+### Start Zooming
+
+![Start Zooming](Images/start-zooming.png)
+
+Demonstrates entering the two-hand zoom interaction.
+
+### Stop Zooming
+
+![Stop Zooming](Images/stop-zooming.png)
+
+Demonstrates the zoom-release interaction.
+
+---
+
+## Interaction Design
+
+Sight-Pad is structured around several persistent interaction variables and timing constraints rather than treating every detected frame as an independent command.
+
+Important design elements include:
+
+- **Press/release thresholds** for click detection
+- **Cooldown periods** to reduce repeated triggering
+- **Scroll-mode state** to separate scrolling from other left-hand interactions
+- **Zoom-mode state** for two-hand zoom interactions
+- **Frame sampling** to reduce processing frequency
+- **Threaded cursor movement** to keep pointer updates responsive
+
+This state-oriented approach is particularly relevant to touchless interfaces, where small landmark fluctuations can otherwise result in unintended system actions.
+
+---
+
+## Performance-Oriented Design
+
+The original implementation includes several mechanisms intended to balance responsiveness and computational cost:
+
+| Mechanism | Role |
+|---|---|
+| 640 × 480 webcam input | Limits the amount of image data processed |
+| Frame sampling | Processes every third frame |
+| MediaPipe Hands | Provides real-time landmark tracking |
+| Threaded cursor movement | Separates cursor updates from the main interaction flow |
+| Cooldown timers | Reduce repeated gesture activation |
+
+These choices reflect an emphasis on real-time interaction rather than offline gesture analysis.
+
+---
+
+## Interaction Parameters
+
+The original implementation contains several configurable parameters controlling gesture behavior:
+
+| Parameter | Purpose |
+|---|---|
+| CLICK_THRESHOLD | Distance threshold for click activation |
+| RELEASE_THRESHOLD | Distance threshold for releasing a click |
+| SCROLL_THRESHOLD | Threshold used by the scrolling interaction |
+| ZOOM_THRESHOLD | Threshold associated with zoom activation/deactivation |
+| COOLDOWN_PERIOD | Minimum time between selected repeated interactions |
+| DOUBLE_CLICK_FREEZE_TIME | Prevents repeated double-click activation |
+| ZOOM_SCALE_FACTOR | Declared zoom-related configuration parameter in the original implementation |
+
+The exact values belong to the private implementation and are therefore not reproduced here.
+
+---
+
+## Technical Stack
+
+| Technology | Role |
+|---|---|
+| Python | Core implementation language |
+| OpenCV | Webcam capture and frame processing |
+| MediaPipe | Hand landmark detection |
+| PyAutoGUI | Desktop mouse/keyboard interaction |
+| NumPy | Geometric distance calculations |
+| Threading | Asynchronous cursor movement |
+
+---
 
 ## Limitations
 
-- **Lighting Conditions**: The accuracy of hand tracking may vary based on lighting.
-- **Performance**: High frame sizes or slow machines may result in lag.
+The original implementation has several practical limitations:
 
-## Future Improvements
+- Hand tracking can be affected by lighting and camera conditions.
+- Landmark jitter can influence threshold-based gesture detection.
+- Touchless interaction depends on maintaining sufficiently clear hand visibility.
+- Gesture thresholds may require adjustment for different users, cameras, or environments.
+- System-level mouse and keyboard actions introduce platform/application-specific behavior.
+- The public repository does not contain the original implementation, so the project cannot be reproduced directly from the repository alone.
 
-- Improve gesture sensitivity and allow users to customize gestures.
-- Add additional gestures for other functionalities such as volume control, window management, or keyboard shortcuts.
+---
+
+## Future Development
+
+Potential directions for extending the project include:
+
+- More robust gesture classification
+- User-configurable gesture thresholds
+- Additional desktop interactions
+- Improved handling of landmark noise and ambiguous gestures
+- Adaptive calibration for different users and camera setups
+- Expanded interaction vocabulary for accessibility-oriented applications
+- Evaluation across a broader range of environments and users
+
+---
+
+## Repository Structure
+
+```
+Sight-Pad/
+├── Images/
+│   ├── double-click.png
+│   ├── left-click.png
+│   ├── right-click.png
+│   ├── scroll-down.png
+│   ├── scroll-mode.png
+│   ├── scroll-up.png
+│   ├── start-zooming.png
+│   └── stop-zooming.png
+├── LICENSE
+└── README.md
+```
+
+The repository intentionally contains documentation and interaction demonstrations rather than the original source implementation.
+
+---
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-```
-MIT License
-
-Copyright (c) 2024 Kian
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-```
-
-## Contributing
-
-Contributions are welcome! Please open an issue to discuss the change you wish to make, and feel free to open a pull request.
+This project is licensed under the **MIT License**. See [LICENSE](LICENSE) for the full license text.
 
 ---
+
+## Project Context
+
+Sight-Pad is part of a broader exploration of **Computer Vision, Human-Computer Interaction, and real-time gesture-based interfaces**.
+
+The project focuses on translating visual hand information into practical desktop interactions and serves as an applied example of landmark-based gesture interaction.
