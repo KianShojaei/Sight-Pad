@@ -1,7 +1,5 @@
 # Sight-Pad
 
-> **A touchless desktop interaction system driven by real-time hand tracking and gesture-based computer vision.**
-
 **Sight-Pad** is a webcam-based hand-gesture interaction system designed to control common desktop pointing, clicking, scrolling, and zooming actions without relying on a physical touchpad.
 
 The project uses **MediaPipe** for real-time hand landmark tracking and **PyAutoGUI** for computer interaction. Its gesture logic is implemented through geometric relationships between tracked hand landmarks, combined with timing, thresholds, cooldowns, and interaction states.
