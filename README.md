@@ -1,5 +1,7 @@
 # Sight-Pad
 
+> **A touchless desktop interaction system driven by real-time hand tracking and gesture-based computer vision.**
+
 **Sight-Pad** is a webcam-based hand-gesture interaction system designed to control common desktop pointing, clicking, scrolling, and zooming actions without relying on a physical touchpad.
 
 The project uses **MediaPipe** for real-time hand landmark tracking and **PyAutoGUI** for computer interaction. Its gesture logic is implemented through geometric relationships between tracked hand landmarks, combined with timing, thresholds, cooldowns, and interaction states.
@@ -27,6 +29,14 @@ The original implementation tracks up to two hands and maps selected hand config
 - Scroll-mode activation
 - Scroll up / down
 - Two-hand zoom control
+
+---
+
+## Project Demonstration
+
+A video demonstration of Sight-Pad is available on LinkedIn:
+
+[Watch the project demonstration on LinkedIn](https://www.linkedin.com/posts/kianshojaei_mediapipe-opencv-activity-7245463781684723713-Vow7)
 
 ---
 
@@ -175,13 +185,13 @@ The original implementation contains several configurable parameters controlling
 
 | Parameter | Purpose |
 |---|---|
-| CLICK_THRESHOLD | Distance threshold for click activation |
-| RELEASE_THRESHOLD | Distance threshold for releasing a click |
-| SCROLL_THRESHOLD | Threshold used by the scrolling interaction |
-| ZOOM_THRESHOLD | Threshold associated with zoom activation/deactivation |
-| COOLDOWN_PERIOD | Minimum time between selected repeated interactions |
-| DOUBLE_CLICK_FREEZE_TIME | Prevents repeated double-click activation |
-| ZOOM_SCALE_FACTOR | Declared zoom-related configuration parameter in the original implementation |
+| click_threshold | Distance threshold for click activation |
+| release_threshold | Distance threshold for releasing a click |
+| scroll_threshold | Threshold used by the scrolling interaction |
+| zoom_threshold | Threshold associated with zoom activation/deactivation |
+| cooldown_period | Minimum time between selected repeated interactions |
+| double_click_freeze_time | Prevents repeated double-click activation |
+| zoom_scale_factor | Declared zoom-related configuration parameter in the original implementation |
 
 The exact values belong to the private implementation and are therefore not reproduced here.
 
