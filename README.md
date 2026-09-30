@@ -8,6 +8,38 @@ The project uses **MediaPipe** for real-time hand landmark tracking and **PyAuto
 
 ---
 
+## Table of Contents
+
+- [Overview](#overview)
+  - [Core Capabilities](#core-capabilities)
+- [Project Demonstration](#project-demonstration)
+- [System Architecture](#system-architecture)
+  - [1. Webcam Input](#1-webcam-input)
+  - [2. Hand Tracking](#2-hand-tracking)
+  - [3. Geometric Gesture Analysis](#3-geometric-gesture-analysis)
+  - [4. Desktop Interaction](#4-desktop-interaction)
+- [Gesture-to-Action Mapping](#gesture-to-action-mapping)
+- [Demonstrated Interactions](#demonstrated-interactions)
+  - [Left Click](#left-click)
+  - [Right Click](#right-click)
+  - [Double Click](#double-click)
+  - [Scroll Mode](#scroll-mode)
+  - [Scroll Up](#scroll-up)
+  - [Scroll Down](#scroll-down)
+  - [Start Zooming](#start-zooming)
+  - [Stop Zooming](#stop-zooming)
+- [Interaction Design](#interaction-design)
+- [Performance-Oriented Design](#performance-oriented-design)
+- [Interaction Parameters](#interaction-parameters)
+- [Technical Stack](#technical-stack)
+- [Limitations](#limitations)
+- [Future Development](#future-development)
+- [Repository Structure](#repository-structure)
+- [License](#license)
+- [Project Context](#project-context)
+
+---
+
 ## Overview
 
 Sight-Pad explores touchless human-computer interaction through hand tracking.
