@@ -213,11 +213,9 @@ The exact values belong to the private implementation and are therefore not repr
 The original implementation has several practical limitations:
 
 - Hand tracking can be affected by lighting and camera conditions.
-- Landmark jitter can influence threshold-based gesture detection.
 - Touchless interaction depends on maintaining sufficiently clear hand visibility.
 - Gesture thresholds may require adjustment for different users, cameras, or environments.
 - System-level mouse and keyboard actions introduce platform/application-specific behavior.
-- The public repository does not contain the original implementation, so the project cannot be reproduced directly from the repository alone.
 
 ---
 
