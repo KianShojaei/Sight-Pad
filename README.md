@@ -79,7 +79,7 @@ Cursor movement is handled separately from several gesture-triggered actions, an
 | Cursor movement | Right-hand index fingertip tracking | Move mouse cursor |
 | Left click | Left-hand index-thumb pinch | Left mouse button |
 | Right click | Right-hand thumb-pinky proximity | Right mouse button |
-| Double click | Dedicated left-hand multi-finger configuration | Double click |
+| Double click | Left-hand index fingertip | Double click |
 | Scroll mode | Left-hand thumb-middle and thumb-ring proximity | Toggle scrolling |
 | Scroll | Left-hand index-thumb distance while scroll mode is active | Scroll up / down |
 | Start zooming | Both index fingertips brought close together | Enter zoom mode |
